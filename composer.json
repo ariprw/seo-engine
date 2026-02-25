@@ -1,0 +1,28 @@
+{
+    "name": "ari/seo-engine",
+    "description": "SEO Engine untuk PHP Native dan Laravel",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ari\\SeoEngine\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ari",
+            "email": "hiariprw@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ari\\SeoEngine\\Laravel\\SeoServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": "^8.2"
+    }
+}
