@@ -64,10 +64,10 @@ require 'vendor/autoload.php';
 use Ari\SeoEngine\Core\Engine\SeoEngine;
 use Ari\SeoEngine\Core\Analyzers\KeywordAnalyzer;
 
-$engine = new SeoEngine();
-$engine->addAnalyzer(new KeywordAnalyzer());
+$seoEngine = new SeoEngine();
+$seoEngine->addAnalyzer(new KeywordAnalyzer());
 
-$result = $engine->analyze([
+$result = $seoEngine->analyze([
     'baseUrl' => 'https://contoh.com',
     'slug' => 'judul-artikel',
     'title' => 'Judul Artikel',
