@@ -7,7 +7,7 @@ Bisa dipakai di PHP native atau langsung di Laravel sebagai package reusable.
 
 ## Instalasi
 
-### Via Composer (Laravel)
+### Laravel
 
 ```bash
 composer require ari/seo-engine
