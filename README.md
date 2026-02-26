@@ -10,13 +10,13 @@ Bisa dipakai di PHP native atau langsung di Laravel sebagai package reusable.
 ### Via Composer (Laravel)
 
 ```bash
-composer require ariprw/seo-engine
+composer require ari/seo-engine
 ```
 
 ### PHP
 ```bash
 git clone https://github.com/ariprw/seo-engine.git
-composer require ariprw/seo-engine:@dev
+composer require ari/seo-engine:@dev
 ```
 
 
