@@ -15,8 +15,7 @@ composer require ari/seo-engine
 
 ### PHP
 ```bash
-git clone https://github.com/ariprw/seo-engine.git
-composer require ari/seo-engine:@dev
+composer require ari/seo-engine
 ```
 
 
