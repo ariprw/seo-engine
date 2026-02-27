@@ -7,25 +7,49 @@ class MetaAnalyzer implements AnalyzerInterface
 {
     public function analyze(array $data): array
     {
-        $metaDescription = $data['metaDescription'] ?? '';
+        $metaDescription = trim($data['metaDescription'] ?? '');
         $keyword = strtolower($data['keyword'] ?? '');
 
+        $issues = [];
+        $score = 0;
+
         if (empty($metaDescription)) {
-            return [
-                'type' => 'meta',
-                'status' => 'bad',
-                'message' => 'Meta description tidak ditemukan.',
-                'issues' => ['Artikel tidak memiliki meta description.']
-            ];
+            $issues[] = "Artikel tidak memiliki meta description.";
+        } else {
+            $score += 30;
         }
 
-        $containsKeyword = stripos($metaDescription, $keyword) !== false;
+        $length = strlen($metaDescription);
+        if ($length < 120) {
+            $issues[] = "Meta description terlalu pendek ({$length} karakter). Ideal 120–160 karakter.";
+        } elseif ($length > 160) {
+            $issues[] = "Meta description terlalu panjang ({$length} karakter). Ideal 120–160 karakter.";
+        } else {
+            $score += 20;
+        }
+
+        $containsKeyword = !empty($keyword) && stripos($metaDescription, $keyword) !== false;
+        if ($containsKeyword) {
+            $score += 50;
+        } else {
+            $issues[] = "Meta description tidak mengandung focus keyword.";
+        }
+
+        if ($score >= 70) {
+            $status = 'good';
+        } elseif ($score >= 40) {
+            $status = 'ok';
+        } else {
+            $status = 'bad';
+        }
 
         return [
             'type' => 'meta',
-            'status' => $containsKeyword ? 'good' : 'bad',
-            'message' => $containsKeyword ? 'Meta description mengandung focus keyword.' : 'Meta description tidak mengandung focus keyword.',
-            'issues' => $containsKeyword ? [] : ['Meta description tidak mengandung focus keyword.']
+            'metaLength' => $length,
+            'containsKeyword' => $containsKeyword,
+            'score' => $score,
+            'status' => $status,
+            'issues' => $issues
         ];
     }
 }

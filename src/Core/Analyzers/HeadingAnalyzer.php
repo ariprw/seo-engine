@@ -10,41 +10,58 @@ class HeadingAnalyzer implements AnalyzerInterface
         $content = $data['content'] ?? '';
         $keyword = strtolower($data['keyword'] ?? '');
 
-        preg_match_all('/<h[1-6]>(.*?)<\/h[1-6]>/', $content, $matches);
+        preg_match_all('/<h([1-6])>(.*?)<\/h\1>/', $content, $matches, PREG_SET_ORDER);
 
-        $headings = $matches[1] ?? [];
-        $headingCount = count($headings);
+        $headingCount = count($matches);
         $keywordInHeadings = 0;
+        $h1HasKeyword = false;
+        $h2h3HasKeyword = 0;
 
-        foreach ($headings as $heading) {
-            if (stripos($heading, $keyword) !== false) {
+        foreach ($matches as $match) {
+            $level = intval($match[1]);
+            $text = strtolower($match[2]);
+
+            if (stripos($text, $keyword) !== false) {
                 $keywordInHeadings++;
+                if ($level === 1) $h1HasKeyword = true;
+                if ($level === 2 || $level === 3) $h2h3HasKeyword++;
             }
         }
 
-        if ($headingCount == 0) {
-            return [
-                'type' => 'heading',
-                'score' => null,
-                'status' => 'bad',
-                'issues' => ['Tidak ada heading dalam artikel']
-            ];
+        $issues = [];
+        $score = 0;
+
+        if ($headingCount === 0) {
+            $issues[] = "Tidak ada heading dalam artikel";
+        } else {
+            $score += 10;
         }
 
-        if ($keywordInHeadings == 0) {
-            return [
-                'type' => 'heading',
-                'score' => null,
-                'status' => 'bad',
-                'issues' => ['Focus keyword tidak ditemukan di heading']
-            ];
+        if (!$h1HasKeyword) {
+            $issues[] = "Focus keyword tidak ditemukan di H1";
+        } else {
+            $score += 40;
         }
+
+        if ($h2h3HasKeyword === 0) {
+            $issues[] = "Focus keyword tidak ditemukan di subheading H2/H3";
+        } else {
+            $score += min(50, $h2h3HasKeyword * 10);
+        }
+
+        if ($score >= 70) $status = 'good';
+        elseif ($score >= 40) $status = 'ok';
+        else $status = 'bad';
 
         return [
             'type' => 'heading',
-            'score' => $keywordInHeadings,
-            'status' => 'good',
-            'issues' => []
+            'totalHeadings' => $headingCount,
+            'keywordInHeadings' => $keywordInHeadings,
+            'h1HasKeyword' => $h1HasKeyword,
+            'h2h3HasKeyword' => $h2h3HasKeyword,
+            'score' => $score,
+            'status' => $status,
+            'issues' => $issues
         ];
     }
 }

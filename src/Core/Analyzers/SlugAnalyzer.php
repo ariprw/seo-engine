@@ -7,23 +7,39 @@ class SlugAnalyzer implements AnalyzerInterface
 {
     public function analyze(array $data): array
     {
-        $slug = $data['slug'] ?? '';
+        $slug = trim($data['slug'] ?? '');
         $keyword = strtolower(str_replace(' ', '-', $data['keyword'] ?? ''));
 
-        if (stripos($slug, $keyword) === false) {
-            return [
-                'type' => 'slug',
-                'status' => 'bad',
-                'message' => 'Slug tidak mengandung focus keyword.',
-                'issues' => ['Slug tidak SEO-friendly.']
-            ];
+        $issues = [];
+        $score = 0;
+
+        if (!empty($keyword) && stripos($slug, $keyword) !== false) {
+            $score += 50;
+        } else {
+            $issues[] = "Slug tidak mengandung focus keyword.";
+        }
+
+        if (preg_match('/^[a-z0-9\-]+$/i', $slug)) {
+            $score += 50;
+        } else {
+            $issues[] = "Slug mengandung karakter yang tidak SEO-friendly.";
+        }
+
+        if ($score >= 80) {
+            $status = 'good';
+        } elseif ($score >= 40) {
+            $status = 'ok';
+        } else {
+            $status = 'bad';
         }
 
         return [
             'type' => 'slug',
-            'status' => 'good',
-            'message' => 'Slug mengandung focus keyword.',
-            'issues' => []
+            'slug' => $slug,
+            'keyword' => $keyword,
+            'score' => $score,
+            'status' => $status,
+            'issues' => $issues
         ];
     }
 }
